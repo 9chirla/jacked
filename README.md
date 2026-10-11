@@ -2,7 +2,7 @@
 
 Personal fitness partner PWA for one trainee. Android-first (Pixel / Chrome), offline-capable logging, honest analytics from stored data only.
 
-**Status:** Phases 0–10 implemented. Deploy to HTTPS for Android install + Lighthouse on a real device.
+**Status:** Phases 0–10 on `main`. Phase 11 weekly planner on branch `phase-11-planner` (apply `supabase/sql-editor/10_phase11_week_plan.sql` before using `/plan`).
 
 ## Stack
 
@@ -33,7 +33,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Apply SQL from `supabase/sql-editor/` in order (`01`…`09`) if the CLI is unavailable. Prefer `supabase/migrations/` as canonical; `01`–`04` are copies of phase 2–5 migrations and are not verified against a remote schema dump.
+Apply SQL from `supabase/sql-editor/` in order (`01`…`10`) if the CLI is unavailable. Prefer `supabase/migrations/` as canonical; `01`–`04` are copies of phase 2–5 migrations and are not verified against a remote schema dump. `10` adds `week_plan` (Phase 11).
 
 ## Deploy (Vercel + Supabase)
 
@@ -86,6 +86,7 @@ Settings → Offline: matrix, simulate offline, sync queue, install button. See 
 | `docs/DATA_MODEL.md` | Schema |
 | `docs/CALCULATIONS.md` | Formulas |
 | `docs/TESTING.md` | Suites + manual gates |
+| `ACCEPTANCE_PHASE11.md` | Phase 11 phone/checklist |
 | `CHANGELOG.md` | User-visible changes |
 
 ## Troubleshooting
