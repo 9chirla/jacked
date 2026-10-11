@@ -40,6 +40,7 @@ export function NavPending() {
         return;
       }
       if (url.origin !== window.location.origin) return;
+      // Ignore hash-only changes (pathname + search unchanged).
       if (
         url.pathname === window.location.pathname &&
         url.search === window.location.search
@@ -53,6 +54,14 @@ export function NavPending() {
     return () =>
       document.removeEventListener("pointerdown", onPointerDown, true);
   }, []);
+
+  useEffect(() => {
+    if (!pending) return;
+    const id = window.setTimeout(() => {
+      setPending(false);
+    }, 8000);
+    return () => window.clearTimeout(id);
+  }, [pending]);
 
   if (!pending) return null;
 
