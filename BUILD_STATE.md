@@ -10,12 +10,16 @@ App through polish/handover; SQL archive `01`–`09`. Acceptance matrix in prior
 
 ## Current work
 
-**Deployment** — GitHub + Vercel (HTTPS) for PWA install / SW.
+**Deployment** — code on GitHub; Vercel project + Auth URLs pending user.
+
+- GitHub (private): https://github.com/9chirla/jacked
 
 ## Exact next actions
 
-1. Finish Vercel project + env vars + Supabase Auth redirect URLs.
-2. Verify production: login → log set → install prompt on Android Chrome.
+1. Import that repo on [vercel.com/new](https://vercel.com/new) (or finish `vercel login` locally).
+2. Set Production env vars (see README Deploy).
+3. Supabase Auth Site URL + `{APP_URL}/auth/confirm` redirect.
+4. Redeploy; verify magic link + Android install.
 
 ## SQL Editor archive
 
