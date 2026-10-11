@@ -21,7 +21,16 @@ export function LoginForm({ nextPath }: LoginFormProps) {
     setMessage(null);
 
     const supabase = createClient();
-    const origin = window.location.origin;
+    // Prefer configured public app URL so magic links never fall back to a
+    // stale localhost Site URL when opened on another device.
+    const configured = (process.env.NEXT_PUBLIC_APP_URL || "").replace(
+      /\/$/,
+      "",
+    );
+    const origin =
+      configured && !configured.includes("localhost")
+        ? configured
+        : window.location.origin;
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {
