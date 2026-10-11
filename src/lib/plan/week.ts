@@ -44,8 +44,11 @@ export function weekdayOfDate(iso: string): Weekday {
  */
 export function weekStartFor(
   dateIso: string,
-  _timeZone: string,
+  timeZone: string,
 ): string {
+  // Calendar day is already localized by the caller; tz is retained for API
+  // symmetry with week_plan.timezone and DST boundary tests.
+  void timeZone;
   const d = parseDateUTC(dateIso);
   const day = d.getUTCDay(); // 0=Sun
   d.setUTCDate(d.getUTCDate() - day);

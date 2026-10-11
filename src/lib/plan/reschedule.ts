@@ -32,7 +32,7 @@ export function rescheduleMissed(input: RescheduleInput): PlannedDay[] {
     3,
   ).filter((date) => !done.some((d) => d.date === date));
 
-  let lastId =
+  const lastId =
     done.sort((a, b) => a.date.localeCompare(b.date)).at(-1)?.templateId ??
     input.lastCompletedTemplateId;
   let idx = nextTemplateIndex(sorted, lastId);
