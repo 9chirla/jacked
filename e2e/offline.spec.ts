@@ -28,4 +28,10 @@ test.describe("offline matrix smoke", () => {
     ).toBeVisible();
     await expect(page.getByRole("link", { name: /Try Today again/i })).toBeVisible();
   });
+
+  // Full plan sync (auth + Supabase + IDB) needs a live session — mark UNVERIFIED
+  // in the Phase 11 report when credentials/services are unavailable.
+  test.skip("offline Today plan strip + reconnect flush", async () => {
+    // Intentionally skipped without auth fixtures.
+  });
 });
