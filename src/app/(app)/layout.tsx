@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/brand/BrandMark";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { SyncBadge } from "@/components/pwa/SyncBadge";
 import { createClient } from "@/lib/supabase/server";
@@ -30,10 +31,11 @@ export default async function AppShellLayout({
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
       <header className="sticky top-0 z-30 border-b border-line/80 bg-bg/90 px-4 py-3 backdrop-blur-md">
         <div className="flex items-center justify-between gap-3">
-          <a href="/today" className="min-h-12 min-w-12 content-center">
-            <span className="font-display text-[26px] font-semibold tracking-tight text-ink">
-              Jacked
-            </span>
+          <a
+            href="/today"
+            className="inline-flex min-h-12 items-center content-center"
+          >
+            <BrandMark size={36} />
           </a>
           <div className="flex items-center gap-1">
             <SyncBadge />

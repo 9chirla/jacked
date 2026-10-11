@@ -7,9 +7,9 @@
   --text: #12160f;
   --muted: #5c665d;
   --line: #dfe4dc;
-  --accent: #c9f24d;
+  --accent: #c3fa08;
   --accent-ink: #0b0e0c;
-  --accent-glow: rgba(201, 242, 77, 0.22);
+  --accent-glow: rgba(195, 250, 8, 0.22);
   --success: #4ade80;
   --warning: #fbbf24;
   --danger: #f87171;
@@ -38,9 +38,9 @@ html.dark {
   --text: #f2f5ee;
   --muted: #9aa394;
   --line: #2c3329;
-  --accent: #c9f24d;
+  --accent: #c3fa08;
   --accent-ink: #0b0e0c;
-  --accent-glow: rgba(201, 242, 77, 0.16);
+  --accent-glow: rgba(195, 250, 8, 0.16);
   --success: #4ade80;
   --warning: #fbbf24;
   --danger: #f87171;

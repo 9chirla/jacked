@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/LoginForm";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -21,7 +22,7 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-10">
-      <p className="font-display text-[26px] font-semibold text-ink">Jacked</p>
+      <BrandMark size={48} />
       <h1 className="font-display mt-2 text-[34px] font-semibold tracking-tight text-ink">
         Sign in
       </h1>

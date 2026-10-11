@@ -1,14 +1,16 @@
 /* Jacked service worker — Phase 9 shell cache + offlineWaiting. */
-const CACHE_NAME = "jacked-shell-v2";
+const CACHE_NAME = "jacked-shell-v3";
 const PRECACHE = [
   "/",
   "/offline",
   "/today",
   "/manifest.webmanifest",
+  "/icons/logo.png",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/maskable-512.png",
   "/icons/apple-touch-icon.png",
+  "/favicon.ico",
 ];
 
 self.addEventListener("install", (event) => {

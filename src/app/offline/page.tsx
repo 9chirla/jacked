@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/brand/BrandMark";
 
 export const metadata = {
   title: "Offline",
@@ -6,7 +7,7 @@ export const metadata = {
 export default function OfflinePage() {
   return (
     <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-8">
-      <p className="font-display text-[26px] font-semibold text-ink">Jacked</p>
+      <BrandMark size={48} />
       <h1 className="font-display mt-3 text-[34px] font-semibold tracking-tight text-ink">
         You are offline
       </h1>
