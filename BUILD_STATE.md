@@ -6,7 +6,7 @@ Updated: 2026-10-11 — Phase 10 gate passed. Deployment in progress.
 
 ### Phase 0–10 — complete
 
-App through polish/handover; SQL archive `01`–`09`. Acceptance matrix in prior BUILD_STATE revision; deferred: Lighthouse + Android install on HTTPS (post-deploy).
+App through polish/handover; SQL Editor archive `01`–`09` under `supabase/sql-editor/` (`01`–`04` are copies of phase 2–5 migrations, not verified against remote schema). Acceptance matrix in prior BUILD_STATE revision; deferred: Lighthouse + Android install on HTTPS (post-deploy).
 
 ## Current work
 
@@ -25,9 +25,9 @@ App through polish/handover; SQL archive `01`–`09`. Acceptance matrix in prior
 
 ## SQL Editor archive
 
-`01`–`09` under `supabase/sql-editor/`.
+`01`–`09` under `supabase/sql-editor/`. `01`–`04` reconstructed from `supabase/migrations/` (phases 2–5); header on each file notes they are not verified against remote schema. Prefer `supabase/migrations/` as canonical.
 
 ## Known / deferred
 
-- Next 16.3.8 + React 19.2.3; full `<a>` nav (Flight soft-nav).
+- Next 16.3.8 + React 19.2.3; soft `Link` (`AppLink`) for primary/section nav is **UNDER TEST** — revert commit `7f59b6c` if `frame.join` / `enqueueModel` returns. Some CTAs remain plain `<a>`.
 - LLM off. Post-deploy: A18/A19/A32.

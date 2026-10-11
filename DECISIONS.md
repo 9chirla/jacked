@@ -34,7 +34,7 @@
 |--------|----------|-----|
 | Photos | Private `progress-photos` bucket + signed URLs | Spec: no public objects; path prefixed with `auth.uid()` |
 | Secret audit | Grep `.next/static` after build | A15 — service role must never ship to client |
-| Nav | Full document loads (`<a>`) | Avoid Flight `enqueueModel` / `frame.join` on 16.3.8 |
+| Nav | Soft `Link` via `AppLink` for primary/section nav (`prefetch` default false); some CTAs remain plain `<a>` | **UNDER TEST** on Next 16.3.8 / React 19.2.3 after perf work. If `frame.join` / `enqueueModel` crashes return, revert soft-nav commit `7f59b6c` (`perf: restore soft navigation with Link and SW v4`). |
 
 ## Phase 9 offline / PWA
 
@@ -45,7 +45,7 @@
 | Conflicts | `sync_conflict` + choose local/server | No LWW on completed workouts |
 | SW register | Secure contexts incl. localhost | Needed to verify install/offline before deploy |
 | Update banner | Hidden on `/log/[sessionId]` | Never interrupt an in-progress session |
-| Primary + section nav | Plain `<a>` (not Next `Link`) | Soft-nav Flight crashes (`frame.join` / `enqueueModel`) on 16.3.8 |
+| Primary + section nav | Soft `Link` (`AppLink`); some CTAs still plain `<a>` | Same UNDER TEST status as Phase 10 Nav row; revert SHA `7f59b6c` if Flight crashes return |
 
 ## Phase 8 data ownership
 

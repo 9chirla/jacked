@@ -33,7 +33,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Apply SQL from `supabase/sql-editor/` in order (`01`…`09`) if the CLI is unavailable.
+Apply SQL from `supabase/sql-editor/` in order (`01`…`09`) if the CLI is unavailable. Prefer `supabase/migrations/` as canonical; `01`–`04` are copies of phase 2–5 migrations and are not verified against a remote schema dump.
 
 ## Deploy (Vercel + Supabase)
 
@@ -93,6 +93,6 @@ Settings → Offline: matrix, simulate offline, sync queue, install button. See 
 | Symptom | Check |
 |---------|-------|
 | Install prompt missing | SW fetch handler, HTTPS, manifest icons, wait after load |
-| `enqueueModel` / `frame.join` | Hard refresh; nav uses full `<a>` loads; clear `.next` |
+| `enqueueModel` / `frame.join` | Hard refresh; clear `.next`. Soft `Link` nav is UNDER TEST — revert commit `7f59b6c` if crashes return after soft-nav |
 | Export / delete fails | `export_log` SQL applied; `SUPABASE_SERVICE_ROLE_KEY` set |
 | Photo upload fails | Paste `09_phase10_progress_photos.sql` |
