@@ -98,9 +98,7 @@ vi.mock("@/app/actions/workout", () => ({
   deleteSession: vi.fn(),
 }));
 
-const upsertWeekPlan = vi.fn(
-  async (_payload?: unknown) => ({ ok: true as const, id: "wp1" }),
-);
+const upsertWeekPlan = vi.fn(async () => ({ ok: true as const, id: "wp1" }));
 vi.mock("@/app/actions/plan", () => ({
   upsertWeekPlan: (payload: unknown) => upsertWeekPlan(payload),
 }));

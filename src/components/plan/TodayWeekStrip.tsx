@@ -5,6 +5,7 @@ import { AppLink } from "@/components/nav/AppLink";
 import { Button } from "@/components/ui/Button";
 import type { PlannedDay } from "@/lib/plan/types";
 import { weekDates, weekdayOfDate } from "@/lib/plan/week";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 const LABELS = ["S", "M", "T", "W", "T", "F", "S"] as const;
@@ -32,6 +33,7 @@ export function TodayWeekStrip({
   adherence,
   greeting,
 }: Props) {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const dates = weekDates(weekStart);
   const byDate = new Map(plannedDays.map((p) => [p.date, p]));
@@ -137,8 +139,8 @@ export function TodayWeekStrip({
           onClick={() => {
             startTransition(async () => {
               await rescheduleActiveWeek();
-              // revalidatePath in upsertWeekPlan refreshes RSC; no router.refresh()
-              window.location.assign("/today");
+              // revalidatePath already returns fresh RSC; avoid router.refresh()
+              router.push("/today");
             });
           }}
         >
