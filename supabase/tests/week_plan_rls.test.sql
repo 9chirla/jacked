@@ -1,0 +1,10 @@
+-- Manual / pgTAP-style checklist for week_plan RLS
+-- Run as authenticated user A vs B after applying phase11 migration.
+--
+-- 1. As user A: insert week_plan for A → succeeds
+-- 2. As user B: select from week_plan where user_id = A → 0 rows
+-- 3. As user B: update/delete A's row → 0 rows affected
+-- 4. As user A: select own row → 1 row
+--
+-- Policies: week_plan_*_own use (select auth.uid()) = user_id
+-- ON DELETE CASCADE from profile removes plans with the account.
