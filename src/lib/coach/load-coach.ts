@@ -3,6 +3,7 @@ import type { CoachReport, CoachTone, NextSessionPrep } from "@/lib/coach/types"
 import { currentWeekStreak } from "@/lib/calculations/streaks";
 import { suggestionsForRecentExercises } from "@/lib/progress/progression-data";
 import { previousPerformanceSummary } from "@/lib/workout/session-data";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 
 const TRACKED_PATTERNS = ["push", "pull", "squat", "hinge", "core"];
@@ -52,18 +53,16 @@ export async function loadCoachReport() {
 }
 
 async function loadCoachReportInner() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const auth = await requireAuthedUserId();
+  if (!auth) return null;
+  const { supabase, userId } = auth;
 
   const { data: profile } = await supabase
     .from("profile")
     .select(
       "coaching_tone, sessions_per_week, checkin_enabled, limitations",
     )
-    .eq("id", user.id)
+    .eq("id", userId)
     .maybeSingle();
 
   const tone = (profile?.coaching_tone as CoachTone) ?? "analytical";
@@ -74,7 +73,7 @@ async function loadCoachReportInner() {
   const { data: sessions } = await supabase
     .from("workout_session")
     .select("id, completed_at, started_at, total_volume, template_id, status")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("status", "completed")
     .order("completed_at", { ascending: false })
     .limit(120);
@@ -115,7 +114,7 @@ async function loadCoachReportInner() {
     const { data: prSets } = await supabase
       .from("exercise_set")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("is_pr", true)
       .gte("completed_at", daysAgoIso(7));
     prs7d = prSets?.length ?? 0;
@@ -133,7 +132,7 @@ async function loadCoachReportInner() {
       .select(
         "id, kind, completed_at, session_exercise!inner(exercise:exercise_id(primary_pattern))",
       )
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("kind", "working")
       .not("completed_at", "is", null)
       .gte("completed_at", daysAgoIso(14))
@@ -174,7 +173,7 @@ async function loadCoachReportInner() {
   const { data: checkInRow, error: checkInError } = await supabase
     .from("daily_check_in")
     .select("fatigue, soreness, sleep, discomfort_text")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("logged_date", today)
     .maybeSingle();
   if (!checkInError && checkInRow) {
@@ -184,7 +183,7 @@ async function loadCoachReportInner() {
   let nextSession: NextSessionPrep | null = null;
   try {
     nextSession = await resolveNextSessionPrep(
-      user.id,
+      userId,
       rows[0]?.template_id as string | null,
       checkIn
         ? {

@@ -2,19 +2,17 @@ import {
   currentWeekStreak,
   sessionsInIsoWeek,
 } from "@/lib/calculations/streaks";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export async function listWeighIns(limit = 120) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const auth = await requireAuthedUserId();
+  if (!auth) return [];
 
-  const { data } = await supabase
+  const { data } = await auth.supabase
     .from("body_weight_entry")
     .select("id, logged_date, weight_kg, context, note")
-    .eq("user_id", user.id)
+    .eq("user_id", auth.userId)
     .order("logged_date", { ascending: true })
     .limit(limit);
 
@@ -28,16 +26,13 @@ export async function listWeighIns(limit = 120) {
 }
 
 export async function listMeasurements(limit = 80) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const auth = await requireAuthedUserId();
+  if (!auth) return [];
 
-  const { data } = await supabase
+  const { data } = await auth.supabase
     .from("body_measurement")
     .select("id, logged_date, site, value_cm, note")
-    .eq("user_id", user.id)
+    .eq("user_id", auth.userId)
     .order("logged_date", { ascending: false })
     .limit(limit);
 

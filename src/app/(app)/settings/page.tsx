@@ -8,7 +8,7 @@ import {
 import { ThemeSettings } from "@/components/settings/ThemeSettings";
 import { Card } from "@/components/ui/Card";
 import { APP_VERSION, EXPORT_SCHEMA_VERSION } from "@/lib/data/schema-version";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 
 export const metadata = {
   title: "Settings",
@@ -22,17 +22,21 @@ export default async function SettingsPage({
   const { section: sectionRaw } = await searchParams;
   const section = resolveSettingsSection(sectionRaw);
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await requireAuthedUserId();
+  if (!auth) return null;
 
-  const { data: profile } = await supabase
+  const emailClaim = auth.claims?.email;
+  const email =
+    typeof emailClaim === "string" && emailClaim.length > 0
+      ? emailClaim
+      : "your account";
+
+  const { data: profile } = await auth.supabase
     .from("profile")
     .select(
       "display_name, mass_unit, length_unit, coaching_tone, logging_detail, progression_model, theme, sessions_per_week, session_minutes, limitations",
     )
-    .eq("id", user!.id)
+    .eq("id", auth.userId)
     .single();
 
   return (
@@ -43,7 +47,7 @@ export default async function SettingsPage({
             Settings
           </h1>
           <p className="mt-2 text-[16px] text-muted">
-            Signed in as {user?.email}. Preference changes never rewrite training
+            Signed in as {email}. Preference changes never rewrite training
             history.
           </p>
         </div>

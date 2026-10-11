@@ -1,5 +1,5 @@
 import { EmptyState } from "@/components/ui/EmptyState";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { ensureLibrarySeeded } from "@/lib/workout/ensure-library";
 
 export const metadata = {
@@ -8,15 +8,13 @@ export const metadata = {
 
 export default async function LogPage() {
   await ensureLibrarySeeded();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await requireAuthedUserId();
+  if (!auth) return null;
 
-  const { data: active } = await supabase
+  const { data: active } = await auth.supabase
     .from("workout_session")
     .select("id, status, started_at, workout_template(name)")
-    .eq("user_id", user!.id)
+    .eq("user_id", auth.userId)
     .in("status", ["in_progress", "paused"])
     .order("started_at", { ascending: false })
     .limit(5);

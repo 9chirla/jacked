@@ -3,11 +3,12 @@ import {
   duplicateTemplate,
   startTemplateSession,
 } from "@/app/actions/library";
+import { DeleteSessionButton } from "@/components/history/DeleteSessionButton";
 import { TemplateActions } from "@/components/library/TemplateActions";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StatTile } from "@/components/ui/StatTile";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { ensureLibrarySeeded } from "@/lib/workout/ensure-library";
 
 export const metadata = {
@@ -16,33 +17,33 @@ export const metadata = {
 
 export default async function TodayPage() {
   await ensureLibrarySeeded();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await requireAuthedUserId();
+  if (!auth) return null;
+  const { supabase, userId } = auth;
 
-  const { data: profile } = await supabase
-    .from("profile")
-    .select("sessions_per_week, session_minutes")
-    .eq("id", user!.id)
-    .maybeSingle();
-
-  const { data: active } = await supabase
-    .from("workout_session")
-    .select("id, status, started_at, workout_template(name)")
-    .eq("user_id", user!.id)
-    .eq("status", "in_progress")
-    .order("started_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const { data: templates } = await supabase
-    .from("workout_template")
-    .select("id, name, day_label")
-    .eq("user_id", user!.id)
-    .eq("is_active", true)
-    .order("sort_order")
-    .limit(2);
+  const [{ data: profile }, { data: active }, { data: templates }] =
+    await Promise.all([
+      supabase
+        .from("profile")
+        .select("sessions_per_week, session_minutes")
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("workout_session")
+        .select("id, status, started_at, workout_template(name)")
+        .eq("user_id", userId)
+        .eq("status", "in_progress")
+        .order("started_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("workout_template")
+        .select("id, name, day_label")
+        .eq("user_id", userId)
+        .eq("is_active", true)
+        .order("sort_order")
+        .limit(2),
+    ]);
 
   const activeTemplate = Array.isArray(active?.workout_template)
     ? active?.workout_template[0]
@@ -74,12 +75,20 @@ export default async function TodayPage() {
               ? active.started_at.replace("T", " ").slice(0, 16)
               : "—"}
           </p>
-          <a
-            href={`/log/${active.id}`}
-            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius)] bg-accent px-4 font-medium text-accent-ink"
-          >
-            Resume session
-          </a>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={`/log/${active.id}`}
+              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-[var(--radius)] bg-accent px-4 font-medium text-accent-ink"
+            >
+              Resume session
+            </a>
+            <DeleteSessionButton
+              sessionId={active.id}
+              status="in_progress"
+              variant="secondary"
+              redirectTo="/today"
+            />
+          </div>
         </Card>
       ) : null}
 

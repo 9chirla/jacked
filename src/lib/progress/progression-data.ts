@@ -3,7 +3,7 @@ import {
   suggestProgression,
   type ProgressionSuggestion,
 } from "@/lib/calculations/progression";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 
 export async function suggestionsForRecentExercises(
   limit = 4,
@@ -15,16 +15,14 @@ export async function suggestionsForRecentExercises(
     suggestion: ProgressionSuggestion;
   }>
 > {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const auth = await requireAuthedUserId();
+  if (!auth) return [];
+  const { supabase, userId } = auth;
 
   const { data: sessions } = await supabase
     .from("workout_session")
     .select("id, completed_at")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("status", "completed")
     .order("completed_at", { ascending: false })
     .limit(12);
@@ -72,7 +70,7 @@ export async function suggestionsForRecentExercises(
   const { data: overrides } = await supabase
     .from("progression_override")
     .select("exercise_id, load, target_reps_low, target_reps_high")
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   const overrideMap = new Map(
     (overrides ?? []).map((o) => [

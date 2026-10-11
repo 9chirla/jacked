@@ -1,6 +1,9 @@
 import { RangeSwitcher } from "@/components/analytics/RangeSwitcher";
 import { ClientWeightTrendChart } from "@/components/progress/ClientCharts";
-import { MeasurementForm } from "@/components/progress/MeasurementForm";
+import {
+  DeleteMeasurementButton,
+  MeasurementForm,
+} from "@/components/progress/MeasurementForm";
 import {
   ProgressSectionNav,
   resolveProgressSection,
@@ -37,8 +40,9 @@ import { suggestionsForRecentExercises } from "@/lib/progress/progression-data";
 import {
   listMeasurements,
   listWeighIns,
+  sessionStats,
 } from "@/lib/progress/weight-data";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 
 export const metadata = {
   title: "Progress",
@@ -52,15 +56,20 @@ export default async function ProgressPage({
   const { focus, range: rangeRaw, section: sectionRaw } = await searchParams;
   const range = resolveRange(rangeRaw);
   const section = resolveProgressSection(sectionRaw, focus);
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await requireAuthedUserId();
+  if (!auth) {
+    return (
+      <EmptyState
+        title="Sign in required"
+        description="Open Progress again after signing in."
+      />
+    );
+  }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await auth.supabase
     .from("profile")
     .select("mass_unit, length_unit, sessions_per_week, photos_enabled")
-    .eq("id", user!.id)
+    .eq("id", auth.userId)
     .maybeSingle();
 
   const massUnit = (profile?.mass_unit as "kg" | "lb") ?? "kg";
@@ -69,8 +78,38 @@ export default async function ProgressPage({
   const photosEnabled = profile?.photos_enabled !== false;
   const todayIso = new Date().toISOString().slice(0, 10);
 
-  const weighIns = await listWeighIns();
-  const measurements = await listMeasurements();
+  // Header tiles — light query only. Section bodies load what they need.
+  const stats = await sessionStats(auth.userId, sessionsTarget);
+
+  let weighIns: Awaited<ReturnType<typeof listWeighIns>> = [];
+  let measurements: Awaited<ReturnType<typeof listMeasurements>> = [];
+  let suggestions: Awaited<ReturnType<typeof suggestionsForRecentExercises>> =
+    [];
+  let bundle: Awaited<ReturnType<typeof analyticsBundle>> | null = null;
+  let measuredPrs: Awaited<ReturnType<typeof listMeasuredPrs>> = [];
+  let estimatedPrs: Awaited<ReturnType<typeof listEstimatedE1rmPrs>> = [];
+  let hardSets: Awaited<ReturnType<typeof hardSetsByMuscleLast7Days>> = [];
+
+  if (section === "training") {
+    bundle = await analyticsBundle({
+      sessionsPerWeek: sessionsTarget,
+      range,
+    });
+  } else if (section === "records") {
+    [measuredPrs, estimatedPrs] = await Promise.all([
+      listMeasuredPrs(),
+      listEstimatedE1rmPrs(),
+    ]);
+  } else if (section === "weight") {
+    weighIns = await listWeighIns();
+  } else if (section === "body") {
+    measurements = await listMeasurements();
+  } else if (section === "suggestions") {
+    suggestions = await suggestionsForRecentExercises(4);
+  } else if (section === "muscles") {
+    hardSets = await hardSetsByMuscleLast7Days();
+  }
+
   const rolling = centredSevenDayAverage(
     weighIns.map((w) => ({ date: w.date, weightKg: w.weightKg })),
   );
@@ -84,15 +123,6 @@ export default async function ProgressPage({
     30,
   );
   const slope = centredSlopeKgPerWeek(rolling);
-  const suggestions = await suggestionsForRecentExercises(4);
-
-  const bundle = await analyticsBundle({
-    sessionsPerWeek: sessionsTarget,
-    range,
-  });
-  const measuredPrs = await listMeasuredPrs();
-  const estimatedPrs = await listEstimatedE1rmPrs();
-  const hardSets = await hardSetsByMuscleLast7Days();
 
   const latestAvg = [...rolling]
     .reverse()
@@ -105,23 +135,23 @@ export default async function ProgressPage({
   }
 
   const summary = buildAnalyticsSummary({
-    sessionsThisWeek: bundle.sessionsThisWeek,
+    sessionsThisWeek: stats.sessionsThisWeek,
     sessionsTarget,
-    streakWeeks: bundle.streakWeeks,
-    volumeDelta: bundle.volumeDelta.delta,
+    streakWeeks: stats.streakWeeks,
+    volumeDelta: bundle?.volumeDelta.delta ?? null,
     measuredPrCount: measuredPrs.length,
-    weightTrend,
+    weightTrend: section === "weight" ? weightTrend : null,
   });
 
   const volumeUnit = massUnit === "lb" ? "lb·reps" : "kg·reps";
-  const volumeBars = bundle.volumeBars.map((b) => ({
+  const volumeBars = (bundle?.volumeBars ?? []).map((b) => ({
     label: b.label,
     value:
       massUnit === "lb"
         ? roundMassDisplay(kgToLb(b.volume))
         : Math.round(b.volume),
   }));
-  const frequencyBars = bundle.frequencyBars.map((b) => ({
+  const frequencyBars = (bundle?.frequencyBars ?? []).map((b) => ({
     label: b.label,
     value: b.count,
   }));
@@ -140,12 +170,12 @@ export default async function ProgressPage({
         <div className="grid grid-cols-2 gap-3">
           <StatTile
             label="Sessions"
-            value={`${bundle.sessionsThisWeek}`}
+            value={`${stats.sessionsThisWeek}`}
             hint={`of ${sessionsTarget} / week`}
           />
           <StatTile
             label="Streak"
-            value={`${bundle.streakWeeks}`}
+            value={`${stats.streakWeeks}`}
             hint="Weeks with ≥1 session"
           />
         </div>
@@ -164,7 +194,7 @@ export default async function ProgressPage({
             Weeks start from your first logged session. Empty weeks after that
             stay as gaps.
           </p>
-          {bundle.completionRate4w != null ? (
+          {bundle?.completionRate4w != null ? (
             <p className="text-[14px] text-muted">
               4-week completion{" "}
               <span className="tabular text-ink">
@@ -347,11 +377,15 @@ export default async function ProgressPage({
             ) : (
               <ul className="space-y-2 text-[14px]">
                 {measurements.slice(0, 10).map((m) => (
-                  <li key={m.id} className="flex justify-between gap-3">
+                  <li
+                    key={m.id}
+                    className="flex items-center justify-between gap-3"
+                  >
                     <span className="text-muted">
                       {m.date} · {m.site.replaceAll("_", " ")}
                     </span>
                     <span className="tabular text-ink">{m.valueCm} cm</span>
+                    <DeleteMeasurementButton id={m.id} />
                   </li>
                 ))}
               </ul>

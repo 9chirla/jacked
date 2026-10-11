@@ -2,7 +2,7 @@ import { HistoryOfflineNote } from "@/components/history/HistoryOfflineNote";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { listCompletedSessions } from "@/lib/analytics/queries";
 import { kgToLb, roundMassDisplay } from "@/lib/calculations/units";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 
 export const metadata = {
   title: "History",
@@ -46,18 +46,17 @@ function formatDuration(seconds: number | null): string {
 }
 
 export default async function HistoryPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profile } = await supabase
-    .from("profile")
-    .select("mass_unit")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const auth = await requireAuthedUserId();
+  if (!auth) return null;
+  const [{ data: profile }, sessions] = await Promise.all([
+    auth.supabase
+      .from("profile")
+      .select("mass_unit")
+      .eq("id", auth.userId)
+      .maybeSingle(),
+    listCompletedSessions(120),
+  ]);
   const massUnit = (profile?.mass_unit as "kg" | "lb") ?? "kg";
-
-  const sessions = await listCompletedSessions(120);
 
   const groups = new Map<string, typeof sessions>();
   for (const s of sessions) {

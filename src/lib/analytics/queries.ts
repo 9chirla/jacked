@@ -16,7 +16,7 @@ import {
   periodVolumeDelta,
   weeklyVolumeBars,
 } from "@/lib/calculations/weekly-volume";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 
 export type { EstimatedPrRow, ExerciseHistoryPoint, MeasuredPrRow, RangeKey };
 
@@ -43,11 +43,9 @@ export function resolveRange(raw: string | undefined): RangeKey {
 }
 
 async function requireUserId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return { supabase, userId: user?.id ?? null };
+  const auth = await requireAuthedUserId();
+  if (!auth) return { supabase: null as never, userId: null };
+  return { supabase: auth.supabase, userId: auth.userId };
 }
 
 export async function listCompletedSessions(limit = 200) {

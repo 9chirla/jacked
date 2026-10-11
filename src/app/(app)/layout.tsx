@@ -1,7 +1,7 @@
 import { BrandMark } from "@/components/brand/BrandMark";
 import { BottomNav } from "@/components/nav/BottomNav";
 import { SyncBadge } from "@/components/pwa/SyncBadge";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { redirect } from "next/navigation";
 
 export default async function AppShellLayout({
@@ -9,18 +9,15 @@ export default async function AppShellLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  const auth = await requireAuthedUserId();
+  if (!auth) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await auth.supabase
     .from("profile")
     .select("onboarded_at, display_name")
-    .eq("id", user.id)
+    .eq("id", auth.userId)
     .maybeSingle();
 
   if (!profile?.onboarded_at) {
