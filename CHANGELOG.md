@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.11.0 — Phase 11 weekly planner
+
+- `week_plan` table + Sunday A→B→A planner (`/plan`)
+- Today week strip, next-session CTA, reschedule, adherence
+- Offline outbox for week plan; Sunday `.ics` calendar reminder
+- Export / import / account-delete cascade include `week_plan`
+
 ## 0.10.0 — Phase 10 polish & handover
 
 - Progress photos: private Storage bucket + signed URLs (Progress → Body)
