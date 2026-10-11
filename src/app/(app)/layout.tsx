@@ -1,8 +1,11 @@
 import { BrandMark } from "@/components/brand/BrandMark";
+import { AppLink } from "@/components/nav/AppLink";
 import { BottomNav } from "@/components/nav/BottomNav";
+import { NavPending } from "@/components/nav/NavPending";
 import { SyncBadge } from "@/components/pwa/SyncBadge";
 import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function AppShellLayout({
   children,
@@ -26,22 +29,25 @@ export default async function AppShellLayout({
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col">
+      <Suspense fallback={null}>
+        <NavPending />
+      </Suspense>
       <header className="sticky top-0 z-30 border-b border-line/80 bg-bg/90 px-4 py-3 backdrop-blur-md">
         <div className="flex items-center justify-between gap-3">
-          <a
+          <AppLink
             href="/today"
             className="inline-flex min-h-12 items-center content-center"
           >
             <BrandMark size={36} />
-          </a>
+          </AppLink>
           <div className="flex items-center gap-1">
             <SyncBadge />
-            <a
+            <AppLink
               href="/settings"
               className="inline-flex min-h-12 items-center rounded-[var(--radius)] px-3 text-[14px] text-muted hover:bg-surface hover:text-ink"
             >
               Settings
-            </a>
+            </AppLink>
           </div>
         </div>
       </header>

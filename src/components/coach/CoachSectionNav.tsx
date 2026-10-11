@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/nav/AppLink";
 import {
   Activity,
   ClipboardCheck,
@@ -26,10 +27,6 @@ export function resolveCoachSection(raw: string | undefined): CoachSectionId {
   return "summary";
 }
 
-/**
- * Plain anchors — Next Link soft-nav + Flight on 16.3 was crashing the
- * overlay with `.stack` / `enqueueModel` after coach server actions.
- */
 export function CoachSectionNav({ current }: { current: CoachSectionId }) {
   return (
     <nav aria-label="Coach sections">
@@ -39,7 +36,7 @@ export function CoachSectionNav({ current }: { current: CoachSectionId }) {
           const active = current === section.id;
           return (
             <li key={section.id}>
-              <a
+              <AppLink
                 href={`/coach?section=${section.id}`}
                 className={cn(
                   "flex min-h-14 flex-col items-center justify-center gap-1 rounded-[var(--radius)] border px-1 text-[12px] transition-colors",
@@ -55,7 +52,7 @@ export function CoachSectionNav({ current }: { current: CoachSectionId }) {
                   aria-hidden
                 />
                 <span>{section.label}</span>
-              </a>
+              </AppLink>
             </li>
           );
         })}

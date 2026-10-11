@@ -1,4 +1,5 @@
 import { HistoryOfflineNote } from "@/components/history/HistoryOfflineNote";
+import { AppLink } from "@/components/nav/AppLink";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { listCompletedSessions } from "@/lib/analytics/queries";
 import { kgToLb, roundMassDisplay } from "@/lib/calculations/units";
@@ -103,7 +104,7 @@ export default async function HistoryPage() {
                       : `${Math.round(s.totalVolume)} kg·reps`;
                 return (
                   <li key={s.id}>
-                    <a
+                    <AppLink
                       href={`/log/${s.id}/review`}
                       className="flex min-h-11 items-center justify-between gap-3 px-3 py-3"
                     >
@@ -121,7 +122,7 @@ export default async function HistoryPage() {
                           {s.totalReps != null ? ` · ${s.totalReps} reps` : ""}
                         </p>
                       </div>
-                    </a>
+                    </AppLink>
                   </li>
                 );
               })}

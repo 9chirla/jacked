@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/nav/AppLink";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { requireAuthedUserId } from "@/lib/supabase/auth";
 import { ensureLibrarySeeded } from "@/lib/workout/ensure-library";
@@ -36,12 +37,12 @@ export default async function LogPage() {
           title="No active workout"
           description="Pick Full Body A or B and tap Start to open an in-progress session."
           action={
-            <a
+            <AppLink
               href="/templates"
               className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius)] bg-accent px-4 font-medium text-accent-ink"
             >
               Choose template
-            </a>
+            </AppLink>
           }
         />
       ) : (
@@ -52,7 +53,7 @@ export default async function LogPage() {
               : session.workout_template;
             return (
               <li key={session.id}>
-                <a
+                <AppLink
                   href={`/log/${session.id}`}
                   className="flex min-h-14 items-center justify-between rounded-[var(--radius-lg)] border border-line bg-surface px-4"
                 >
@@ -60,7 +61,7 @@ export default async function LogPage() {
                     {template?.name ?? "Workout"}
                   </span>
                   <span className="text-[14px] text-muted">{session.status}</span>
-                </a>
+                </AppLink>
               </li>
             );
           })}

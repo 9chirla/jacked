@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/nav/AppLink";
 import {
   Database,
   Info,
@@ -26,7 +27,6 @@ export function resolveSettingsSection(
   return "profile";
 }
 
-/** Plain anchors — same Flight-safe pattern as Coach section nav. */
 export function SettingsSectionNav({
   current,
 }: {
@@ -40,7 +40,7 @@ export function SettingsSectionNav({
           const active = current === section.id;
           return (
             <li key={section.id}>
-              <a
+              <AppLink
                 href={`/settings?section=${section.id}`}
                 className={cn(
                   "flex min-h-14 flex-col items-center justify-center gap-1 rounded-[var(--radius)] border px-1 text-[12px] transition-colors",
@@ -56,7 +56,7 @@ export function SettingsSectionNav({
                   aria-hidden
                 />
                 <span>{section.label}</span>
-              </a>
+              </AppLink>
             </li>
           );
         })}

@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/nav/AppLink";
 import {
   BarChart3,
   Dumbbell,
@@ -31,10 +32,6 @@ export function resolveProgressSection(
   return "training";
 }
 
-/**
- * Plain anchors — Next Link soft-nav + Flight on 16.3 was crashing with
- * `frame.join` / `enqueueModel` after section switches.
- */
 export function ProgressSectionNav({
   current,
   range,
@@ -50,7 +47,7 @@ export function ProgressSectionNav({
           const active = current === section.id;
           return (
             <li key={section.id}>
-              <a
+              <AppLink
                 href={`/progress?section=${section.id}&range=${range}`}
                 className={cn(
                   "flex min-h-14 flex-col items-center justify-center gap-1 rounded-[var(--radius)] border px-1 text-[12px] transition-colors",
@@ -66,7 +63,7 @@ export function ProgressSectionNav({
                   aria-hidden
                 />
                 <span>{section.label}</span>
-              </a>
+              </AppLink>
             </li>
           );
         })}

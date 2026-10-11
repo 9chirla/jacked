@@ -1,5 +1,5 @@
-/* Jacked service worker — Phase 9 shell cache + offlineWaiting. */
-const CACHE_NAME = "jacked-shell-v3";
+/* Jacked service worker — shell cache + safe navigation caching. */
+const CACHE_NAME = "jacked-shell-v4";
 const PRECACHE = [
   "/",
   "/offline",
@@ -49,6 +49,21 @@ function shouldBypass(url) {
   );
 }
 
+/** Next soft-nav / prefetch Flight payloads must never be served stale. */
+function isRscRequest(request, url) {
+  if (url.searchParams.has("_rsc")) return true;
+  if (request.headers.get("RSC") === "1") return true;
+  if (request.headers.get("Next-Router-Prefetch") === "1") return true;
+  const accept = request.headers.get("Accept") || "";
+  return accept.includes("text/x-component");
+}
+
+function putCache(request, response) {
+  if (!response || !response.ok) return;
+  const copy = response.clone();
+  caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
@@ -56,33 +71,48 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (shouldBypass(url)) return;
 
-  if (request.mode === "navigate") {
+  // Soft navigations: always network (live data).
+  if (isRscRequest(request, url)) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((cached) => cached || caches.match("/offline")),
-        ),
+      fetch(request).catch(async () => {
+        const cached = await caches.match(request);
+        return cached || Response.error();
+      }),
     );
     return;
   }
 
+  // Full document navigations: stale-while-revalidate for instant paint.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      (async () => {
+        const cached = await caches.match(request);
+        const networkPromise = fetch(request)
+          .then((response) => {
+            putCache(request, response);
+            return response;
+          })
+          .catch(() => null);
+
+        if (cached) {
+          event.waitUntil(networkPromise);
+          return cached;
+        }
+
+        const network = await networkPromise;
+        if (network) return network;
+        return (await caches.match("/offline")) || Response.error();
+      })(),
+    );
+    return;
+  }
+
+  // Static assets / icons: cache-first, refresh in background.
   event.respondWith(
     caches.match(request).then((cached) => {
       const network = fetch(request)
         .then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
+          putCache(request, response);
           return response;
         })
         .catch(() => cached);

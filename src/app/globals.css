@@ -131,6 +131,19 @@ html.dark {
 
 /* Opacity only — transform creates a containing block and traps
    position:fixed overlays (keypad, sheets) inside the page column. */
+@keyframes nav-pending-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+.nav-pending-bar {
+  animation: nav-pending-slide 0.9s ease-in-out infinite;
+}
+
 @keyframes settle-in {
   from {
     opacity: 0;

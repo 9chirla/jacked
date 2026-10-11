@@ -1,5 +1,6 @@
 "use client";
 
+import { AppLink } from "@/components/nav/AppLink";
 import { cn } from "@/lib/cn";
 import {
   Activity,
@@ -18,10 +19,7 @@ const items = [
   { href: "/coach", label: "Coach", icon: MessageSquareText },
 ] as const;
 
-/**
- * Plain anchors for primary nav — Next Link soft-nav + React 19 / Next 16.3
- * Flight has been crashing with `frame.join` / `enqueueModel`.
- */
+/** Primary nav — soft Link + loading.tsx so taps stream a skeleton instead of a full reload. */
 export function BottomNav() {
   const pathname = usePathname();
 
@@ -40,7 +38,7 @@ export function BottomNav() {
 
           return (
             <li key={item.href} className="flex justify-center">
-              <a
+              <AppLink
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
@@ -56,7 +54,7 @@ export function BottomNav() {
                   strokeWidth={2}
                 />
                 <span className={cn(primary && "sr-only")}>{item.label}</span>
-              </a>
+              </AppLink>
             </li>
           );
         })}

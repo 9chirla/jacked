@@ -1,3 +1,4 @@
+import { AppLink } from "@/components/nav/AppLink";
 import type { RangeKey } from "@/lib/analytics/types";
 import { cn } from "@/lib/cn";
 
@@ -9,7 +10,6 @@ const OPTIONS: { key: RangeKey; label: string }[] = [
   { key: "all", label: "All" },
 ];
 
-/** Plain anchors — avoid Flight soft-nav crashes on range switches. */
 export function RangeSwitcher({
   current,
   section,
@@ -28,7 +28,7 @@ export function RangeSwitcher({
         if (section) params.set("section", section);
         params.set("range", opt.key);
         return (
-          <a
+          <AppLink
             key={opt.key}
             href={`/progress?${params.toString()}`}
             className={cn(
@@ -40,7 +40,7 @@ export function RangeSwitcher({
             aria-current={current === opt.key ? "page" : undefined}
           >
             {opt.label}
-          </a>
+          </AppLink>
         );
       })}
     </div>
