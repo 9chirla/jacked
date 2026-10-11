@@ -72,7 +72,7 @@ export default async function TemplatesPage() {
       {(templates?.length ?? 0) === 0 ? (
         <EmptyState
           title="No templates"
-          description="Apply the Phase 3 SQL migration to seed Full Body A/B, or create a blank template above."
+          description="Seed Full Body A/B from the library seed, or create a blank template above."
         />
       ) : (
         <ul className="space-y-3">

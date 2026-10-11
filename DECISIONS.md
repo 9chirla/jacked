@@ -28,6 +28,16 @@
 | After server actions | No `router.refresh()` | `revalidatePath` already returns a fresh RSC payload; a second refresh double-fetches Flight. |
 | error.tsx | Minimal, no effect/logging | Logging or auto-`retry()` on Flight error proxies makes the Next overlay read `.stack` on undefined. |
 
+## Phase 11 weekly planner
+
+| Choice | Decision | Why |
+|--------|----------|-----|
+| Week definition | Sunday-start local calendar week; `week_start` date + `timezone` on `week_plan` | Matches “plan Sunday after Saturday shifts” |
+| Rotation | Continue A→B→A from last **completed** template (`sort_order`), not restart each week | Same as Coach prep; Today previously always showed A |
+| Plan sync | Outbox `week_plan`/`upsert` only; LWW by `client_updated_at` | Soft preference data; completed workouts stay conflict-aware |
+| Offline scope | Active plan cached in IDB + queued upsert | Phase 12 expands other entities |
+| Planner route | `/plan` (not BottomNav) | Keep 5-tab IA; entry from Today / Settings |
+
 ## Phase 10 polish
 
 | Choice | Decision | Why |

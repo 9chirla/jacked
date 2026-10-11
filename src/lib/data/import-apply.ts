@@ -68,6 +68,7 @@ export async function applyImport(
     "body_measurement",
     "progression_override",
     "daily_check_in",
+    "week_plan",
     "progress_photo",
   ];
 

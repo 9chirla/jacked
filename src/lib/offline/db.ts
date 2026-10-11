@@ -29,7 +29,8 @@ export type OutboxEntry = {
     | "exercise_set"
     | "workout_session"
     | "body_weight_entry"
-    | "exercise";
+    | "exercise"
+    | "week_plan";
   op: "upsert" | "delete" | "finish" | "create";
   payload: unknown;
   clientCreatedAt: string;

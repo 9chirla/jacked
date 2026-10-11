@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 
 const MATRIX: { fn: string; online: boolean; offline: string }[] = [
   { fn: "View today's planned workout", online: true, offline: "✅ from cache" },
+  { fn: "Week plan view / edit", online: true, offline: "✅ IDB + queued upsert" },
   { fn: "Log sets, complete a workout", online: true, offline: "✅ queued" },
   { fn: "Edit/delete a cached workout", online: true, offline: "✅ queued" },
   { fn: "Body weight entry", online: true, offline: "✅ queued" },

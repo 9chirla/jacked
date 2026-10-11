@@ -27,8 +27,7 @@ export default async function LogPage() {
           Log
         </h1>
         <p className="mt-2 text-[16px] text-muted">
-          Start a template from Today or Templates. Set keypad logging ships in
-          Phase 4.
+          Resume an in-progress session, or start from Today / Templates.
         </p>
       </section>
 

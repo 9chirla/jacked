@@ -2,7 +2,7 @@
 
 Canonical storage units: **kg** and **cm**. Display units live on `profile`.
 
-Migrations: `supabase/migrations/`. SQL Editor archive: `supabase/sql-editor/01`–`09`.
+Migrations: `supabase/migrations/`. SQL Editor archive: `supabase/sql-editor/01`–`10`.
 
 Every exposed table: RLS on, default grants revoked, policies for `authenticated` via `(select auth.uid())`.
 
@@ -23,6 +23,7 @@ Every exposed table: RLS on, default grants revoked, policies for `authenticated
 | `body_measurement` | `user_id` | |
 | `progression_override` | `user_id` | |
 | `daily_check_in` | `user_id` | Coach recovery |
+| `week_plan` | `user_id` | Unique `(user_id, week_start)`; Sunday-start; `planned_days` jsonb; `client_updated_at` LWW |
 | `export_log` | `user_id` | Insert/select only |
 | `sync_conflict` | `user_id` | Offline conflict audit |
 | `progress_photo` | `user_id` | Metadata; files in Storage |

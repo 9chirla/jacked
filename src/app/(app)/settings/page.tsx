@@ -5,9 +5,11 @@ import {
   resolveSettingsSection,
   SettingsSectionNav,
 } from "@/components/settings/SettingsSectionNav";
+import { SundayReminder } from "@/components/settings/SundayReminder";
 import { ThemeSettings } from "@/components/settings/ThemeSettings";
 import { Card } from "@/components/ui/Card";
 import { APP_VERSION, EXPORT_SCHEMA_VERSION } from "@/lib/data/schema-version";
+import { getAppUrl } from "@/lib/env";
 import { requireAuthedUserId } from "@/lib/supabase/auth";
 
 export const metadata = {
@@ -109,6 +111,15 @@ export default async function SettingsPage({
               <dd className="tabular text-ink">{EXPORT_SCHEMA_VERSION}</dd>
             </div>
           </dl>
+          <div className="pt-2">
+            <h3 className="font-display text-[18px] font-semibold text-ink">
+              Remind me Sunday
+            </h3>
+            <SundayReminder
+              appUrl={getAppUrl()}
+              timeZone="UTC"
+            />
+          </div>
           <a
             href="/offline"
             className="inline-flex min-h-12 items-center text-[14px] text-muted underline-offset-4 hover:underline"

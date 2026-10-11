@@ -17,6 +17,7 @@ import {
   deleteWeighIn,
   upsertWeighIn,
 } from "@/app/actions/progress";
+import { upsertWeekPlan } from "@/app/actions/plan";
 import {
   deleteSession,
   deleteSet,
@@ -41,6 +42,7 @@ const defaultActions = {
   upsertWeighIn,
   deleteWeighIn,
   createCustomExercise,
+  upsertWeekPlan,
 };
 
 type FlushOptions = {
