@@ -1,5 +1,6 @@
 "use client";
 
+import { DeleteSessionButton } from "@/components/history/DeleteSessionButton";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -338,10 +339,16 @@ export function WorkoutLogger({
         </div>
       </header>
 
-      <section>
+      <section className="space-y-3">
         <h1 className="font-display text-[34px] font-semibold tracking-tight text-ink">
           {title}
         </h1>
+        <DeleteSessionButton
+          sessionId={sessionId}
+          status={status}
+          variant="ghost"
+          redirectTo={isCompleted ? "/history" : "/today"}
+        />
       </section>
 
       {restRunning || restSeconds > 0 ? (

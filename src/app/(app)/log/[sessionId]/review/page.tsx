@@ -1,3 +1,4 @@
+import { DeleteSessionButton } from "@/components/history/DeleteSessionButton";
 import { Card } from "@/components/ui/Card";
 import { StatTile } from "@/components/ui/StatTile";
 import { createClient } from "@/lib/supabase/server";
@@ -66,7 +67,7 @@ export default async function SessionReviewPage({
         </Card>
       ) : null}
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <a
           href="/today"
           className="inline-flex min-h-12 items-center rounded-[var(--radius)] bg-accent px-4 text-[16px] font-medium text-accent-ink"
@@ -80,6 +81,12 @@ export default async function SessionReviewPage({
           View session
         </a>
       </div>
+
+      <DeleteSessionButton
+        sessionId={sessionId}
+        status={session.status ?? "completed"}
+        redirectTo="/history"
+      />
     </div>
   );
 }

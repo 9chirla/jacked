@@ -199,6 +199,34 @@ export async function deleteSet(setId: string): Promise<ActionResult> {
   return { ok: true, id: setId };
 }
 
+export async function deleteSession(sessionId: string): Promise<ActionResult> {
+  const { supabase, user } = await requireUser();
+  if (!user) return { ok: false, error: "Sign in required." };
+  if (!sessionId) return { ok: false, error: "Session required." };
+
+  const { data: existing } = await supabase
+    .from("workout_session")
+    .select("id, status")
+    .eq("id", sessionId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!existing) return { ok: false, error: "Session not found." };
+
+  const { error } = await supabase
+    .from("workout_session")
+    .delete()
+    .eq("id", sessionId)
+    .eq("user_id", user.id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/today");
+  revalidatePath("/history");
+  revalidatePath("/progress");
+  revalidatePath(`/log/${sessionId}`);
+  revalidatePath(`/log/${sessionId}/review`);
+  return { ok: true, id: sessionId };
+}
+
 export async function finishSession(input: unknown): Promise<ActionResult> {
   const parsed = finishSessionSchema.safeParse(input);
   if (!parsed.success) {

@@ -16,6 +16,7 @@ type Dispatcher = {
   upsertSet: (input: unknown) => Promise<SyncActionResult>;
   deleteSet: (setId: string) => Promise<SyncActionResult>;
   finishSession: (input: unknown) => Promise<SyncActionResult>;
+  deleteSession: (sessionId: string) => Promise<SyncActionResult>;
   upsertWeighIn: (input: unknown) => Promise<SyncActionResult>;
   deleteWeighIn: (id: string) => Promise<SyncActionResult>;
   createCustomExercise: (input: unknown) => Promise<SyncActionResult>;
@@ -55,6 +56,9 @@ export async function dispatchOutboxEntry(
     case "workout_session":
       if (entry.op === "finish") {
         return actions.finishSession(payload);
+      }
+      if (entry.op === "delete") {
+        return actions.deleteSession(String(payload.id));
       }
       return { ok: false, error: `Unsupported session op ${entry.op}` };
     case "body_weight_entry":

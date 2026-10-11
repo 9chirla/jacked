@@ -18,6 +18,7 @@ import {
   upsertWeighIn,
 } from "@/app/actions/progress";
 import {
+  deleteSession,
   deleteSet,
   finishSession,
   upsertSet,
@@ -36,6 +37,7 @@ const defaultActions = {
   upsertSet,
   deleteSet,
   finishSession,
+  deleteSession,
   upsertWeighIn,
   deleteWeighIn,
   createCustomExercise,

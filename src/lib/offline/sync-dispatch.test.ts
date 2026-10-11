@@ -28,6 +28,7 @@ describe("dispatchOutboxEntry", () => {
         upsertSet,
         deleteSet: vi.fn(),
         finishSession: vi.fn(),
+        deleteSession: vi.fn(),
         upsertWeighIn: vi.fn(),
         deleteWeighIn: vi.fn(),
         createCustomExercise: vi.fn(),
@@ -49,11 +50,33 @@ describe("dispatchOutboxEntry", () => {
         upsertSet: vi.fn(),
         deleteSet: vi.fn(),
         finishSession: vi.fn(),
+        deleteSession: vi.fn(),
         upsertWeighIn: vi.fn(),
         deleteWeighIn,
         createCustomExercise: vi.fn(),
       },
     );
     expect(deleteWeighIn).toHaveBeenCalledWith("w1");
+  });
+
+  it("routes session delete", async () => {
+    const deleteSession = vi.fn(async () => ({ ok: true as const }));
+    await dispatchOutboxEntry(
+      entry({
+        entity: "workout_session",
+        op: "delete",
+        payload: { id: "sess1" },
+      }),
+      {
+        upsertSet: vi.fn(),
+        deleteSet: vi.fn(),
+        finishSession: vi.fn(),
+        deleteSession,
+        upsertWeighIn: vi.fn(),
+        deleteWeighIn: vi.fn(),
+        createCustomExercise: vi.fn(),
+      },
+    );
+    expect(deleteSession).toHaveBeenCalledWith("sess1");
   });
 });

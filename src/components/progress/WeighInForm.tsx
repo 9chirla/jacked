@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { kgToLb, lbToKg, roundMassDisplay } from "@/lib/calculations/units";
 import { queueAndSync } from "@/lib/offline/mutate";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 type Props = {
@@ -134,6 +135,7 @@ export function WeighInForm({ massUnit, latestKg, defaultDate }: Props) {
 }
 
 export function DeleteWeighInButton({ id }: { id: string }) {
+  const router = useRouter();
   const { refreshPending } = useSyncStatus();
   const [pending, startTransition] = useTransition();
   return (
@@ -144,7 +146,7 @@ export function DeleteWeighInButton({ id }: { id: string }) {
       onClick={() => {
         if (!window.confirm("Delete this weigh-in?")) return;
         startTransition(async () => {
-          await queueAndSync({
+          const result = await queueAndSync({
             entity: "body_weight_entry",
             op: "delete",
             payload: { id },
@@ -152,6 +154,7 @@ export function DeleteWeighInButton({ id }: { id: string }) {
             execute: () => deleteWeighIn(id),
           });
           await refreshPending();
+          if (result.ok) router.refresh();
         });
       }}
     >

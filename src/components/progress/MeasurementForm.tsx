@@ -1,8 +1,9 @@
 "use client";
 
-import { upsertMeasurement } from "@/app/actions/progress";
+import { deleteMeasurement, upsertMeasurement } from "@/app/actions/progress";
 import { Button } from "@/components/ui/Button";
 import { cmToIn, inToCm, roundLengthDisplay } from "@/lib/calculations/units";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 const SITES = [
@@ -104,5 +105,26 @@ export function MeasurementForm({ lengthUnit, defaultDate }: Props) {
         </p>
       )}
     </div>
+  );
+}
+
+export function DeleteMeasurementButton({ id }: { id: string }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      className="text-[14px] text-muted underline-offset-4 hover:underline"
+      onClick={() => {
+        if (!window.confirm("Delete this measurement?")) return;
+        startTransition(async () => {
+          const result = await deleteMeasurement(id);
+          if (result.ok) router.refresh();
+        });
+      }}
+    >
+      Delete
+    </button>
   );
 }

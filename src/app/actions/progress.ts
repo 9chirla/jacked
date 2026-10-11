@@ -83,6 +83,24 @@ export async function deleteWeighIn(id: string): Promise<ActionResult> {
   return { ok: true, id };
 }
 
+export async function deleteMeasurement(id: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sign in required." };
+
+  const { error } = await supabase
+    .from("body_measurement")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/progress");
+  return { ok: true, id };
+}
+
 export async function upsertMeasurement(input: unknown): Promise<ActionResult> {
   const parsed = measurementSchema.safeParse(input);
   if (!parsed.success) {
