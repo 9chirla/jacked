@@ -162,6 +162,21 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
           await setCache(CACHE_KEYS.exercises, result.data.exercises);
           await setCache(CACHE_KEYS.weighIns, result.data.weighIns);
           await setCache(CACHE_KEYS.sessions90d, result.data.sessions);
+          if (result.data.weekPlan) {
+            const wp = result.data.weekPlan;
+            await setCache(CACHE_KEYS.weekPlanActive, {
+              id: wp.id,
+              userId: wp.user_id,
+              weekStart: wp.week_start,
+              timezone: wp.timezone,
+              availableDays: wp.available_days,
+              plannedDays: wp.planned_days,
+              status: wp.status,
+              clientUpdatedAt: wp.client_updated_at,
+            });
+          } else {
+            await setCache(CACHE_KEYS.weekPlanActive, null);
+          }
           await setCache(CACHE_KEYS.seededAt, result.data.seededAt);
           sessionStorage.setItem("jacked.seedAt", new Date().toISOString());
         } catch {

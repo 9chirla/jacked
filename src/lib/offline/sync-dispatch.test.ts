@@ -32,6 +32,7 @@ describe("dispatchOutboxEntry", () => {
         upsertWeighIn: vi.fn(),
         deleteWeighIn: vi.fn(),
         createCustomExercise: vi.fn(),
+        upsertWeekPlan: vi.fn(),
       },
     );
     expect(result.ok).toBe(true);
@@ -54,6 +55,7 @@ describe("dispatchOutboxEntry", () => {
         upsertWeighIn: vi.fn(),
         deleteWeighIn,
         createCustomExercise: vi.fn(),
+        upsertWeekPlan: vi.fn(),
       },
     );
     expect(deleteWeighIn).toHaveBeenCalledWith("w1");
@@ -75,8 +77,31 @@ describe("dispatchOutboxEntry", () => {
         upsertWeighIn: vi.fn(),
         deleteWeighIn: vi.fn(),
         createCustomExercise: vi.fn(),
+        upsertWeekPlan: vi.fn(),
       },
     );
     expect(deleteSession).toHaveBeenCalledWith("sess1");
+  });
+
+  it("routes week_plan upsert", async () => {
+    const upsertWeekPlan = vi.fn(async () => ({ ok: true as const }));
+    await dispatchOutboxEntry(
+      entry({
+        entity: "week_plan",
+        op: "upsert",
+        payload: { week_start: "2026-10-11" },
+      }),
+      {
+        upsertSet: vi.fn(),
+        deleteSet: vi.fn(),
+        finishSession: vi.fn(),
+        deleteSession: vi.fn(),
+        upsertWeighIn: vi.fn(),
+        deleteWeighIn: vi.fn(),
+        createCustomExercise: vi.fn(),
+        upsertWeekPlan,
+      },
+    );
+    expect(upsertWeekPlan).toHaveBeenCalledWith({ week_start: "2026-10-11" });
   });
 });

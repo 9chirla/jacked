@@ -5,6 +5,7 @@ export const CACHE_KEYS = {
   exercises: "exercises",
   weighIns: "weighIns",
   sessions90d: "sessions90d",
+  weekPlanActive: "weekPlanActive",
   seededAt: "seededAt",
 } as const;
 

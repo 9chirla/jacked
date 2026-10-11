@@ -20,6 +20,7 @@ type Dispatcher = {
   upsertWeighIn: (input: unknown) => Promise<SyncActionResult>;
   deleteWeighIn: (id: string) => Promise<SyncActionResult>;
   createCustomExercise: (input: unknown) => Promise<SyncActionResult>;
+  upsertWeekPlan: (input: unknown) => Promise<SyncActionResult>;
 };
 
 /** Execute one outbox entry against live server actions. */
@@ -71,6 +72,11 @@ export async function dispatchOutboxEntry(
         return actions.createCustomExercise(payload);
       }
       return { ok: false, error: `Unsupported exercise op ${entry.op}` };
+    case "week_plan":
+      if (entry.op === "upsert") {
+        return actions.upsertWeekPlan(payload);
+      }
+      return { ok: false, error: `Unsupported week_plan op ${entry.op}` };
     default:
       return { ok: false, error: "Unknown outbox entity" };
   }

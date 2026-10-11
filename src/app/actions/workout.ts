@@ -294,6 +294,13 @@ export async function finishSession(input: unknown): Promise<ActionResult> {
     return { ok: false, error: error?.message ?? "Could not finish session." };
   }
 
+  try {
+    const { applySessionToWeekPlan } = await import("@/app/actions/plan");
+    await applySessionToWeekPlan(session.id as string);
+  } catch {
+    // Plan update is best-effort; finishing the session already succeeded.
+  }
+
   revalidatePath(`/log/${session.id}`);
   revalidatePath("/today");
   revalidatePath("/history");
